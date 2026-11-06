@@ -1,5 +1,7 @@
-Unreleased
-==========
+3.1.0-adwise.1 / 2026-11-06
+=========================
+
+Adwise prerelease, distributed as a built GitHub release tarball under the package name `@adwise/prettier-plugin-twig`.
 
 ## Fixes
 

@@ -1,10 +1,10 @@
 {
-  "name": "@destination/prettier-plugin-twig",
-  "version": "3.1.0",
-  "description": "Prettier Twig/HTML plugin by Destination",
+  "name": "@adwise/prettier-plugin-twig",
+  "version": "3.1.0-adwise.1",
+  "description": "Adwise fork of Destination's Prettier Twig/HTML plugin",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wearedestination/prettier-plugin-twig.git"
+    "url": "git+https://github.com/adwise/prettier-plugin-twig.git"
   },
   "author": "Andy Palmer <andy.palmer@wearedestination.com>",
   "contributors": [
@@ -13,9 +13,9 @@
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "homepage": "https://github.com/wearedestination/prettier-plugin-twig",
+  "homepage": "https://github.com/adwise/prettier-plugin-twig",
   "bugs": {
-    "url": "https://github.com/wearedestination/prettier-plugin-twig/issues"
+    "url": "https://github.com/adwise/prettier-plugin-twig/issues"
   },
   "files": [
     "grammar/*",

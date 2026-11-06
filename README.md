@@ -1,4 +1,7 @@
-# Twig HTML Prettier Plugin
+# Twig HTML Prettier Plugin — Adwise fork
+
+Temporary Adwise fork of [Destination's plugin](https://github.com/wearedestination/prettier-plugin-twig), with Craft CMS compatibility fixes.
+The package is named `@adwise/prettier-plugin-twig` and is currently distributed as a built GitHub release tarball, not through the npm registry.
 
 This is a fork of the excellent [Shopify Liquid Prettier Plugin](https://github.com/Shopify/prettier-plugin-liquid).
 
@@ -13,17 +16,17 @@ It may happen to work for some of them (such as `.xml.twig`), but that is incide
 
 ```bash
 # with npm
-npm install --save-dev prettier @destination/prettier-plugin-twig
+npm install --save-dev prettier https://github.com/adwise/prettier-plugin-twig/releases/download/adwise-v3.1.0-1/adwise-prettier-plugin-twig-3.1.0-adwise.1.tgz
 
 # with pnpm
-pnpm add --save-dev prettier @destination/prettier-plugin-twig
+pnpm add --save-dev prettier https://github.com/adwise/prettier-plugin-twig/releases/download/adwise-v3.1.0-1/adwise-prettier-plugin-twig-3.1.0-adwise.1.tgz
 ```
 
 The plugin must be declared in the [configuration](https://prettier.io/docs/en/configuration.html).
 
 ```
 {
-  "plugins": ["@destination/prettier-plugin-twig"]
+  "plugins": ["@adwise/prettier-plugin-twig"]
 }
 ```
 
