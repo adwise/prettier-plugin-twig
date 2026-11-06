@@ -1,3 +1,12 @@
+Unreleased
+==========
+
+## Fixes
+
+* Parse adjacent attribute expressions such as `<div{{ attributes|raw }}>...</div>` using the matching static closing tag, while retaining compound names such as `<h{{ level }}>...</h{{ level }}>`. Preserve adjacency when printing attributes, including on void elements.
+* Parse Craft CMS `switch`/`case`/`default` branches, including nested switches and switches without a default, without treating Twig `case` branches as Liquid `case` blocks.
+* Recognize Craft CMS `cache`, `nav`, and `ifchildren` as paired blocks so their contents are validated and indented.
+
 3.1.0 / 2026-08-13
 ==================
 

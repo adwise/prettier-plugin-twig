@@ -39,7 +39,14 @@ import {
 
 import { printChildren } from '~/printer/print/children';
 
-const LIQUID_TAGS_THAT_ALWAYS_BREAK = ['for', 'case'];
+const LIQUID_TAGS_THAT_ALWAYS_BREAK = [
+  'for',
+  'case',
+  'switch',
+  'cache',
+  'nav',
+  'ifchildren',
+];
 
 const { builders, utils } = doc;
 const { group, hardline, ifBreak, indent, join, line, softline, literalline } =
@@ -489,7 +496,7 @@ export function printLiquidTag(
         'children',
       ),
     );
-    if (node.name === 'case') body = indent(body);
+    if (node.name === 'case' || node.name === 'switch') body = indent(body);
   } else if (node.children.length > 0) {
     body = indent([
       innerLeadingWhitespace(node),

@@ -248,6 +248,8 @@ export interface CycleMarkup extends ASTNode<NodeTypes.CycleMarkup> {
 
 export interface LiquidTagCase
   extends LiquidTagNode<NamedTags.case, LiquidExpression> {}
+export interface LiquidBranchCase
+  extends LiquidBranchNode<NamedTags.case, LiquidExpression> {}
 export interface LiquidBranchWhen
   extends LiquidBranchNode<NamedTags.when, LiquidExpression[]> {}
 
@@ -328,6 +330,7 @@ export type LiquidBranch =
 export type LiquidBranchNamed =
   | LiquidBranchElseif
   | LiquidBranchElsif
+  | LiquidBranchCase
   | LiquidBranchWhen;
 
 interface LiquidBranchNode<Name, Markup>
@@ -544,17 +547,20 @@ interface ASTBuildOptions {
 export function isBranchedTag(node: LiquidHtmlNode) {
   return (
     node.type === NodeTypes.LiquidTag &&
-    ['if', 'for', 'unless', 'case'].includes(node.name)
+    ['if', 'for', 'unless', 'case', 'switch'].includes(node.name)
   );
 }
 
 // Not exported because you can use node.type === NodeTypes.LiquidBranch.
 function isLiquidBranchDisguisedAsTag(
   node: LiquidHtmlNode,
+  inSwitch: boolean,
 ): node is LiquidTagBaseCase {
   return (
     node.type === NodeTypes.LiquidTag &&
-    ['else', 'elseif', 'elsif', 'when'].includes(node.name)
+    typeof node.markup === 'string' &&
+    (['else', 'elseif', 'elsif', 'when'].includes(node.name) ||
+      (inSwitch && ['case', 'default'].includes(node.name)))
   );
 }
 
@@ -651,7 +657,11 @@ class ASTBuilder {
   push(node: LiquidHtmlNode) {
     if (
       node.type === NodeTypes.LiquidTag &&
-      isLiquidBranchDisguisedAsTag(node)
+      isLiquidBranchDisguisedAsTag(
+        node,
+        this.grandparent?.type === NodeTypes.LiquidTag &&
+          this.grandparent.name === 'switch',
+      )
     ) {
       this.cursor.pop();
       this.cursor.pop();
@@ -687,6 +697,21 @@ class ASTBuilder {
         node.locStart,
         node.locEnd,
       );
+    }
+
+    // A matching static close disambiguates <div{{ attributes }}> from <h{{ level }}>.
+    if (
+      this.parent.type === NodeTypes.HtmlElement &&
+      node.type === ConcreteNodeTypes.HtmlTagClose &&
+      this.parent.name[0].type === NodeTypes.TextNode &&
+      this.parent.name[0].value === getName(node) &&
+      this.parent.name
+        .slice(1)
+        .every((part) => part.type === NodeTypes.LiquidDrop)
+    ) {
+      const attributes = this.parent.name.slice(1) as LiquidDrop[];
+      this.parent.name = this.parent.name.slice(0, 1);
+      this.parent.attributes.unshift(...attributes);
     }
 
     if (
@@ -810,7 +835,15 @@ function buildAst(
       }
 
       case ConcreteNodeTypes.LiquidTagOpen: {
-        builder.open(toLiquidTag(node, { isBlockTag: true, ...options }));
+        const isSwitchCase =
+          node.name === 'case' &&
+          builder.grandparent?.type === NodeTypes.LiquidTag &&
+          builder.grandparent.name === 'switch';
+        if (isSwitchCase) {
+          builder.push(toLiquidTag(node, { isBlockTag: false, ...options }));
+        } else {
+          builder.open(toLiquidTag(node, { isBlockTag: true, ...options }));
+        }
         break;
       }
 
@@ -1033,7 +1066,7 @@ function liquidTagBaseAttributes(
 }
 
 function liquidBranchBaseAttributes(
-  node: ConcreteLiquidTag,
+  node: ConcreteLiquidTag | ConcreteLiquidTagOpen,
 ): Omit<LiquidBranch, 'name' | 'markup'> {
   return {
     type: NodeTypes.LiquidBranch,
@@ -1069,7 +1102,7 @@ function toLiquidTag(
 
 function toNamedLiquidTag(
   node: ConcreteLiquidTagNamed | ConcreteLiquidTagOpenNamed,
-  options: ASTBuildOptions,
+  options: ASTBuildOptions & { isBlockTag: boolean },
 ): LiquidTagNamed | LiquidBranchNamed {
   switch (node.name) {
     case NamedTags.echo: {
@@ -1178,6 +1211,13 @@ function toNamedLiquidTag(
     }
 
     case NamedTags.case: {
+      if (!options.isBlockTag) {
+        return {
+          ...liquidBranchBaseAttributes(node),
+          name: node.name,
+          markup: toExpression(node.markup),
+        };
+      }
       return {
         ...liquidTagBaseAttributes(node),
         name: node.name,

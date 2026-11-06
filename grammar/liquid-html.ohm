@@ -302,10 +302,15 @@ Liquid <: Helpers {
     | "case"
     | "for"
     | "ifchanged"
+    | "ifchildren"
     | "if"
     | "unless"
     | "tablerow"
     | "block"
+    // Craft CMS blocks
+    | "switch"
+    | "cache"
+    | "nav"
     ) endOfIdentifier
 }
 
@@ -422,7 +427,7 @@ LiquidHTML <: Liquid {
   TagEnd<name> = "</" name ">"
 
   HtmlVoidElement =
-    #("<" voidElementName &(space | "/" | ">")) AttrList "/"? ">"
+    #("<" voidElementName &(space | "/" | ">" | "{{")) AttrList "/"? ">"
 
   HtmlSelfClosingElement =
     #("<" tagName) AttrList "/>"

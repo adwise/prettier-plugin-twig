@@ -44,6 +44,22 @@ Prettier for Twig supports the following options.
 | `singleLineLinkTags`        | `false` | If set to `true`, will print `<link>` tags on a single line to remove clutter                                                                                  |
 | `indentSchema`              | `false` | If set to `true`, will indent the contents of the `{% schema %}` tag                                                                                           |
 
+## Craft CMS
+
+Craft's `cache`, `nav`, and `ifchildren` tags are recognized as paired blocks.
+`switch` supports `case` branches, an optional `default`, and nested switches.
+No `twigMultiTags` configuration is required for these tags.
+
+Adjacent attribute output such as `<div{{ attributes|raw }}>...</div>` is
+distinguished from a compound tag name by its static closing tag. Compound
+names with matching closing tags, such as `<h{{ level }}>...</h{{ level }}>`,
+remain supported. Attribute output immediately after void element names is also supported.
+
+The parser still requires HTML and Twig blocks to form a tree. An HTML tag opened
+in one template and closed in another cannot be validated as a complete element.
+Whitespace-control markers may be added to preserve meaningful lack of whitespace;
+they are not removed just to produce a cleaner diff.
+
 ## Ignoring code
 
 We support the following comments (either via HTML or Twig comments):

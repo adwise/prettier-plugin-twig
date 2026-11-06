@@ -34,7 +34,7 @@ import {
 } from '~/printer/utils';
 
 const {
-  builders: { breakParent, indent, join, line, softline, hardline },
+  builders: { breakParent, indent, line, softline, hardline },
 } = doc;
 const { replaceEndOfLine } = doc.utils as any;
 
@@ -325,7 +325,14 @@ function printAttributes(
           last(node.attributes).position.end,
         ),
       )
-    : join(whitespaceBetweenAttributes, printedAttributes);
+    : printedAttributes.map((attribute, index) => [
+        index === 0 ||
+        node.attributes[index - 1].position.end ===
+          node.attributes[index].position.start
+          ? ''
+          : whitespaceBetweenAttributes,
+        attribute,
+      ]);
 
   let trailingInnerWhitespace: Doc;
   if (
@@ -358,9 +365,17 @@ function printAttributes(
       : softline;
   }
 
+  const nameEnd =
+    typeof node.name === 'string'
+      ? node.blockStartPosition.start + 1 + node.name.length
+      : last(node.name).position.end;
+  const hasAdjacentAttribute =
+    first(node.attributes).type === NodeTypes.LiquidDrop &&
+    first(node.attributes).position.start === nameEnd;
+
   return [
     indent([
-      forceNotToBreakAttrContent ? ' ' : line,
+      hasAdjacentAttribute ? '' : forceNotToBreakAttrContent ? ' ' : line,
       forceBreakAttrContent ? breakParent : '',
       attributes,
     ]),
